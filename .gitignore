@@ -1,0 +1,9 @@
+_build/
+_build_*/
+*.beam
+erl_crash.dump
+rebar3.crashdump
+.rebar3/
+.DS_Store
+Thumbs.db
+*.log

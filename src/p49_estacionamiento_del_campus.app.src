@@ -1,0 +1,16 @@
+%% -*- erlang -*-
+{application, p49_estacionamiento_del_campus, [
+  {description, "Estacionamiento del campus - proyecto 49"},
+  {vsn, "0.1.0"},
+  {registered, [
+    p49_estacionamiento_del_campus_sup,
+    p49_estacionamiento_del_campus_server,
+    p49_registro,
+    p49_http,
+    p49_zonas_sup
+  ]},
+  {mod, {p49_estacionamiento_del_campus_app, []}},
+  {applications, [kernel, stdlib, crypto, cowboy, recon]},
+  {env, []},
+  {modules, []}
+]}.

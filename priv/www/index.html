@@ -1,0 +1,278 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Estacionamiento del campus</title>
+  <link rel="stylesheet" href="/static/app.css?v=20261111-6">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark">P</div>
+        <div class="brand-text">
+          <h1>Control de estacionamientos</h1>
+          <p>Consulta los espacios disponibles en los estacionamientos del campus</p>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <span id="conexion" class="status-pill offline">
+          <span class="status-dot"></span>
+          <span id="conexion-texto">Conectando</span>
+        </span>
+      </div>
+    </header>
+
+    <nav class="tabs" role="tablist" aria-label="Secciones">
+      <button class="tab active" data-tab="alumnos" role="tab" aria-selected="true">Alumnos</button>
+      <button class="tab" data-tab="admin" role="tab" aria-selected="false">Administración</button>
+    </nav>
+
+    <main>
+      <!-- ============================ ALUMNOS ============================ -->
+      <section id="vista-alumnos" class="vista active">
+        <div class="student-grid">
+          <article class="card map-card">
+            <div class="card-head">
+              <div>
+                <h2>Mapa del estacionamiento</h2>
+                <p class="muted">Vista de un estacionamiento a la vez. Arriba tienes los 4 del campus.</p>
+              </div>
+              <button id="btn-ampliar" class="btn btn-ghost" type="button">Ampliar mapa</button>
+            </div>
+
+            <div id="campus-overview" class="campus-overview" aria-label="Distribución de los estacionamientos"></div>
+
+            <div class="map-section-head">
+              <strong>Estacionamientos recomendados para tu edificio</strong>
+              <span class="muted">Toca uno para ver su mapa</span>
+            </div>
+            <div id="chips-zonas" class="zone-chips" aria-label="Estacionamientos recomendados"></div>
+
+            <div class="map-meta">
+              <div>
+                <strong id="mapa-zona-nombre">Cargando estacionamientos…</strong>
+                <span id="mapa-zona-meta" class="muted"></span>
+              </div>
+              <span id="mapa-zona-estado" class="mini-badge">—</span>
+            </div>
+
+            <div id="mapa-compacto" class="parking-map compact"></div>
+
+            <div class="legend">
+              <span><i class="dot libre"></i>Libre</span>
+              <span><i class="dot reservado"></i>Reservado</span>
+              <span><i class="dot ocupado"></i>Ocupado</span>
+              <span><i class="dot fuera"></i>Fuera de servicio</span>
+            </div>
+            <p class="hint">La vista compacta muestra 30 cajones alrededor de tu recomendación. «Ampliar mapa» muestra el estacionamiento completo. La asignación siempre es automática.</p>
+          </article>
+
+          <aside class="card destination-card">
+            <div class="card-head">
+              <div>
+                <h2>Tu destino</h2>
+                <p class="muted">Elige tu edificio y te diremos qué estacionamientos te corresponden.</p>
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="select-edificio">Edificio</label>
+              <select id="select-edificio"></select>
+            </div>
+            <div id="destino-zonas" class="destino-zonas"></div>
+            <div class="field">
+              <label for="select-tipo">Tipo de usuario</label>
+              <select id="select-tipo"></select>
+            </div>
+            <div class="field">
+              <label for="input-placa">Placa</label>
+              <input id="input-placa" maxlength="12" value="ABC-123-A" autocomplete="off" spellcheck="false">
+            </div>
+
+            <div id="reco-options" class="reco-options">
+              <button id="reco-card" class="reco-option empty" type="button" aria-pressed="false">
+                <span class="reco-top">
+                  <span class="reco-label">Opción 1</span>
+                  <span id="reco-badge" class="badge">En espera</span>
+                </span>
+                <span id="reco-cajon" class="reco-code">—</span>
+                <span id="reco-detalle" class="reco-detail">Selecciona un edificio para recibir una recomendación.</span>
+                <span class="reco-check" aria-hidden="true">✓</span>
+              </button>
+
+              <button id="reco-alt-card" class="reco-option" type="button" aria-pressed="false" hidden>
+                <span class="reco-top">
+                  <span class="reco-label">Opción 2</span>
+                  <span id="reco-alt-badge" class="badge">Disponible</span>
+                </span>
+                <span id="reco-alt-cajon" class="reco-code"></span>
+                <span id="reco-alt-detalle" class="reco-detail"></span>
+                <span class="reco-check" aria-hidden="true">✓</span>
+              </button>
+            </div>
+            <p class="reco-note muted">Cada estacionamiento numera sus cajones por separado: un mismo número puede repetirse en dos zonas.</p>
+
+            <div class="actions">
+              <button id="btn-confirmar" class="btn btn-primary" type="button" disabled>Confirmar reserva</button>
+            </div>
+
+            <div id="mensaje-alumno" class="message" hidden></div>
+            <div id="reserva-info" class="reservation-info" hidden></div>
+
+            <div id="estancia-card" class="reservation-info estancia-card" hidden>
+              <div class="estancia-head">
+                <strong>Mi estacionamiento</strong>
+                <span id="estancia-badge" class="badge">—</span>
+              </div>
+              <div id="estancia-detalle" class="estancia-detalle"></div>
+              <div class="estancia-actions">
+                <button id="btn-entrada" class="btn btn-primary" type="button" disabled>Registrar entrada</button>
+                <button id="btn-salida" class="btn btn-secondary" type="button" disabled>Registrar salida</button>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ============================ ADMIN ============================ -->
+      <section id="vista-admin" class="vista" hidden>
+        <div id="admin-pin" class="pin-wrap">
+          <div class="card pin-card">
+            <div class="pin-icon">PIN</div>
+            <h2>Acceso administrativo</h2>
+            <p class="muted">Ingresa el PIN para consultar estadísticas y operar el estacionamiento.</p>
+            <form id="form-pin" autocomplete="off">
+              <input id="input-pin" type="password" inputmode="numeric" maxlength="6" placeholder="••••••" autocomplete="new-password" spellcheck="false" aria-label="PIN de administración">
+              <button class="btn btn-primary" type="submit">Entrar</button>
+            </form>
+            <p id="pin-error" class="error-text" hidden>PIN incorrecto.</p>
+          </div>
+        </div>
+
+        <div id="admin-panel" hidden>
+          <div class="admin-head">
+            <div>
+              <h2>Panel de administración</h2>
+              <p class="muted">Estado del campus y operación de estacionamientos.</p>
+            </div>
+            <div class="admin-actions">
+              <button id="btn-refrescar-admin" class="btn btn-ghost" type="button">Actualizar</button>
+              <button id="btn-salir-admin" class="btn btn-ghost" type="button">Salir</button>
+            </div>
+          </div>
+
+          <div id="admin-stats" class="stats-grid"></div>
+
+          <div class="admin-grid admin-grid-pair">
+            <article class="card">
+              <div class="card-head">
+                <div>
+                  <h2>Estacionamientos</h2>
+                  <p class="muted">Cierra o reabre un estacionamiento completo.</p>
+                </div>
+              </div>
+              <div id="admin-zonas" class="zone-list"></div>
+            </article>
+
+            <article class="card">
+              <div class="card-head">
+                <div>
+                  <h2>Actividad</h2>
+                  <p class="muted">Movimientos e incidencias recientes.</p>
+                </div>
+              </div>
+              <div class="activity-tabs">
+                <button class="chip active" data-activity="movimientos" type="button">Movimientos</button>
+                <button class="chip" data-activity="incidencias" type="button">Incidencias</button>
+              </div>
+              <div id="activity-list" class="activity-list"></div>
+            </article>
+          </div>
+
+          <div class="admin-grid admin-grid-single">
+            <article class="card">
+              <div class="card-head">
+                <div>
+                  <h2>Cajones por estacionamiento</h2>
+                  <p class="muted">Clic en un cajón libre para sacarlo de servicio; en uno fuera de servicio para habilitarlo; en uno ocupado o reservado para liberarlo. Los cajones con estancia activa muestran la placa.</p>
+                </div>
+              </div>
+              <div class="admin-map-tools">
+                <select id="admin-zona-select" aria-label="Estacionamiento a administrar"></select>
+                <span id="admin-map-hint" class="muted"></span>
+              </div>
+              <div id="admin-mapa" class="parking-map admin"></div>
+              <div class="legend">
+                <span><i class="dot libre"></i>Libre</span>
+                <span><i class="dot reservado"></i>Reservado</span>
+                <span><i class="dot ocupado"></i>Ocupado</span>
+                <span><i class="dot fuera"></i>Fuera de servicio</span>
+              </div>
+            </article>
+          </div>
+
+          <details class="card advanced-tools" id="advanced-tools">
+            <summary>Herramientas avanzadas</summary>
+            <p class="muted advanced-hint">Simulación de concurrencia y diagnóstico técnico. Úsalas para pruebas o demostraciones.</p>
+
+            <div class="advanced-block">
+              <h3>Simulación concurrente</h3>
+              <p class="muted">Solicitudes simultáneas sin duplicar cajones.</p>
+              <form id="form-simulacion" class="sim-form">
+                <div class="sim-fields">
+                  <label>Solicitudes
+                    <input id="sim-cantidad" type="number" min="10" max="2000" value="120">
+                  </label>
+                  <label>Edificio
+                    <select id="sim-edificio"></select>
+                  </label>
+                  <label>Tipo
+                    <select id="sim-tipo"></select>
+                  </label>
+                </div>
+                <div class="sim-actions">
+                  <button class="btn btn-primary" type="submit">Ejecutar simulación</button>
+                  <button id="btn-escenario" class="btn btn-secondary" type="button">Escenario completo (1,200 autos)</button>
+                </div>
+              </form>
+              <div id="sim-resultado" class="sim-result" hidden></div>
+            </div>
+
+            <details class="diagnostics" id="diagnostics">
+              <summary>Diagnóstico del nodo (recon)</summary>
+              <pre id="diagnostico">Abre esta sección para consultar el nodo.</pre>
+            </details>
+          </details>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- ============================ MODAL MAPA ============================ -->
+  <div id="modal-mapa" class="modal" hidden>
+    <div class="modal-backdrop" data-cerrar-modal></div>
+    <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="modal-titulo">
+      <div class="modal-head">
+        <div>
+          <h2 id="modal-titulo">Mapa del estacionamiento</h2>
+          <p id="modal-sub" class="muted"></p>
+        </div>
+        <button id="btn-cerrar-modal" class="btn btn-ghost" type="button">Cerrar</button>
+      </div>
+      <div id="modal-chips" class="zone-chips"></div>
+      <div id="mapa-amplio" class="parking-map expanded"></div>
+      <div class="legend">
+        <span><i class="dot libre"></i>Libre</span>
+        <span><i class="dot reservado"></i>Reservado</span>
+        <span><i class="dot ocupado"></i>Ocupado</span>
+        <span><i class="dot fuera"></i>Fuera de servicio</span>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast" hidden></div>
+  <script src="/static/app.js?v=20261111-6" defer></script>
+</body>
+</html>

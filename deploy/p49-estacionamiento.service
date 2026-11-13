@@ -1,0 +1,25 @@
+[Unit]
+Description=Estacionamiento del campus (Erlang/OTP, proyecto 49)
+Documentation=file:/opt/p49-estacionamiento-del-campus/README.md
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=pi
+Group=pi
+WorkingDirectory=/opt/p49-estacionamiento-del-campus
+# Opcional: P49_ADMIN_PIN=otro-pin; si no existe, se usa el de sys.config.
+EnvironmentFile=-/etc/p49-estacionamiento.env
+ExecStart=/opt/p49-estacionamiento-del-campus/bin/p49_estacionamiento_del_campus foreground
+ExecStop=/opt/p49-estacionamiento-del-campus/bin/p49_estacionamiento_del_campus stop
+Restart=on-failure
+RestartSec=3
+LimitNOFILE=65536
+# El listener HTTP usa el puerto 8080 por defecto (config/sys.config).
+# Ajusta la politica de reinicio si el nodo se ejecuta detras de un proxy.
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
