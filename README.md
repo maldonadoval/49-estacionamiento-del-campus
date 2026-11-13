@@ -78,3 +78,12 @@ El prototipo visual fue desarrollado con Google Stitch.
 ## Autoría
 
 Proyecto académico número 49: Estacionamiento del Campus.
+
+## Entregables relacionados  
+
+- Manual de usuario y documentación:
+  https://gist.github.com/maldonadoval/9b975dab288c38a5dc8405930200a84c
+
+- Diseño UX/UI en Google Stitch:
+  https://stitch.google.com/projects/13150276982696384196
+  
